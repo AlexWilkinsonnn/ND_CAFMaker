@@ -9,7 +9,7 @@ setup genie_phyopt v2_12_10   -q dkcharmtau
 setup geant4 v4_10_3_p01b -q e15:debug
 setup jobsub_client
 setup eigen v3_3_5
-setup duneanaobj v01_01_01 -q e15:gv1:debug
+setup duneanaobj v01_01_01 -q debug:e15:gv1 # Need to be debug not prof
 setup hdf5 v1_10_2a -q e15
 setup fhiclcpp v4_06_08 -q debug:e15
 
@@ -42,3 +42,7 @@ export PATH=$mydir/bin:$PATH
 
 # our FCL needs to be findable too
 export FHICL_FILE_PATH="$FHICL_FILE_PATH:$mydir/cfg"
+
+# Needed for dumpTree.py to run
+export GXMLPATH=${PWD}/sim_inputs:${GXMLPATH}
+export GNUMIXML="${PWD}/sim_inputs/GNuMIFlux.xml"

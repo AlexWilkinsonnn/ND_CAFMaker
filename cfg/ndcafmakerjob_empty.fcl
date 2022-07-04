@@ -1,0 +1,3 @@
+#include "NDCAFMaker.fcl"
+
+nd_cafmaker: @local::standard_nd_cafmaker

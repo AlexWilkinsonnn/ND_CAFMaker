@@ -106,7 +106,7 @@ TOPVOL="volArgonCubeActive"
 
 TARDIR="/pnfs/dune/persistent/users/LBL_TDR/sw_tarballs"
 #OUTDIR="/pnfs/dune/persistent/users/marshalc/nd_offaxis/v7"
-OUTDIR="/pnfs/dune/persistent/users/abooth/Production/ND_CAFMaker/nd_offaxis/v7"
+OUTDIR="/dune/data2/users/awilkins/extrapolation/nd_cafs"
 
 # Don't try over and over again to copy a file when it isn't going to work
 export IFDH_CP_UNLINK_ON_ERROR=1
@@ -138,7 +138,6 @@ ${CP} ${TARDIR}/edep-sim.tar.gz edep-sim.tar.gz
 ${CP} ${TARDIR}/nusystematics.tar.gz nusystematics.tar.gz
 ${CP} ${TARDIR}/nusyst_inputs.tar.gz nusyst_inputs.tar.gz
 ${CP} ${TARDIR}/DUNE_ND_GeoEff.tar.gz DUNE_ND_GeoEff.tar.gz
-
 
 tar -xzf sim_inputs.tar.gz
 tar -xzf edep-sim.tar.gz

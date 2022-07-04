@@ -1,0 +1,9 @@
+#include "NDCAFMaker.fcl"
+
+nd_cafmaker: @local::standard_nd_cafmaker
+
+nd_cafmaker.CAFMakerSettings.InputDumpFile: "/dune/data2/users/awilkins/extrapolation/nd_cafs/dump/0m/00/FHC.1000000.dump.root"
+nd_cafmaker.CAFMakerSettings.InputGHEPFile: "/dune/data2/users/awilkins/extrapolation/nd_cafs/genie/0m/00/FHC.1000000.ghep.root"
+nd_cafmaker.CAFMakerSettings.OutputFile: "/dune/data2/users/awilkins/extrapolation/nd_cafs/my_CAF/FHC.1000000.caf.root"
+
+# nd_cafmaker.CAFMakerSettings.NDLArRecoFile: "/dune/data/users/jwolcott/nd/nd-lar-reco/cafmaker_input/neutrino.LArTMSProductionJun23withLArCV.99.summary.h5"

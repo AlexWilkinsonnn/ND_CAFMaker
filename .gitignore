@@ -1,0 +1,10 @@
+*.o
+*.tar.gz
+AutoDict_*
+
+edep-sim/
+lib/
+local_flux_files/
+DUNE_ND_GeoEff/
+bin/
+EDepSimEvents/

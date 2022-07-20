@@ -28,6 +28,8 @@ namespace cafmaker
   {
     // these are mandatory and have no default values
     fhicl::Atom<std::string> dumpFile   { fhicl::Name{"InputDumpFile"}, fhicl::Comment("Input file (result of `dumpTree.py`)") };
+    // this should probably be optional but not sure on the optional configuration atm
+    fhicl::Atom<std::string> fdpredsFile { fhicl::Name{"InputFDPredsFile"}, fhicl::Comment("Input file (result of translation network)") };
     fhicl::Atom<std::string> ghepFile   { fhicl::Name{"InputGHEPFile"}, fhicl::Comment("Input .ghep (GENIE) file") };
     fhicl::Atom<std::string> outputFile { fhicl::Name{"OutputFile"}, fhicl::Comment("Filename for output CAF") };
 

@@ -36,6 +36,7 @@ progopt::variables_map parseCmdLine(int argc, const char** argv)
   progopt::options_description fclopts("FCL overrides (for quick tests; edit your .fcl for regular usage)");
   fclopts.add_options()
       ("dump,d",     progopt::value<std::string>(), "input 'dump' file from dumpTree.py")
+      ("fdpreds,d",  progopt::value<std::string>(), "input 'dump' file of FD pred reco from translation network")
       ("ghep,g",     progopt::value<std::string>(), "input GENIE .ghep file")
       ("out,o",      progopt::value<std::string>(), "output CAF file")
       ("startevt",   progopt::value<int>(),         "event number to start at")
@@ -85,6 +86,8 @@ fhicl::Table<cafmaker::FhiclConfig> parseConfig(const std::string & configFile, 
   // insert anything overridden on the command line here
   if (vm.count("dump"))
     provisional.put("nd_cafmaker.CAFMakerSettings.InputDumpFile", vm["dump"].as<std::string>());
+  if (vm.count("fdpreds"))
+    provisional.put("nd_cafmaker.CAFMakerSettings.InputFDPredsFile", vm["fdpreds"].as<std::string>());
   if (vm.count("ghep"))
     provisional.put("nd_cafmaker.CAFMakerSettings.InputGHEPFile", vm["ghep"].as<std::string>());
   if (vm.count("out"))
@@ -147,6 +150,7 @@ void loop(CAF& caf,
           cafmaker::Params &par,
           TTree * intree,
           TTree * gtree,
+          TTree* fdtree,
           const std::vector<std::unique_ptr<cafmaker::IRecoBranchFiller>> & recoFillers)
 {
   //// read in dumpTree output file
@@ -155,6 +159,8 @@ void loop(CAF& caf,
 
   caf.pot = gtree->GetWeight();
   gtree->SetBranchAddress( "gmcrec", &caf.mcrec );
+
+  fdtree->SetBranchAddress("truenumuscore", &caf.sr.FDPredCVNResultIsAntineutrino)
 
   // Main event loop
   int N = par().cafmaker().numevts() > 0 ? par().cafmaker().numevts() : intree->GetEntries() - par().cafmaker().first();
@@ -210,6 +216,10 @@ int main( int argc, char const *argv[] )
 
   TFile * gf = new TFile( par().cafmaker().ghepFile().c_str() );
   TTree * gtree = (TTree*) gf->Get( "gtree" );
+
+  // Write FD predicitions from TTree to CAF file (should go in a reco filler I guess, just putting in the main loop for now)
+  TFIle* fileFDPred = new TFile(par().cafmaker().fdpredsFile().c_str());
+  TTree* treeFDPred = (TTree*)fileFDPred->Get("recodump/FDReco");
 
   loop( caf, par, tree, gtree, getRecoFillers(par) );
 

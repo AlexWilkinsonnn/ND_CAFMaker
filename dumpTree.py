@@ -84,6 +84,9 @@ def loop( evt, tgeo, tout ):
             print "Event %d of %d..." % (ient,N)
         events.GetEntry(ient)
 
+        t_eventID[0] = -1;
+        t_eventID[0] = event.EventId;
+
         for ivtx,vertex in enumerate(event.Primaries):
 
             ## initialize output variables
@@ -400,6 +403,9 @@ if __name__ == "__main__":
     # make an output ntuple
     fout = ROOT.TFile( args.outfile, "RECREATE" )
     tout = ROOT.TTree( "tree","tree" )
+    # include edep-sim eventID for matching translation results
+    t_eventID = array('i',[0])
+    tout.Branch('eventID', t_eventID, 'eventID/I')
     t_ievt = array('i',[0])
     tout.Branch('ievt',t_ievt,'ievt/I')
     t_Ev = array('f', [0.])

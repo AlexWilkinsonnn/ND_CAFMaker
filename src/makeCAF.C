@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <map>
 
 #include "boost/program_options/options_description.hpp"
 #include "boost/program_options/parsers.hpp"
@@ -160,7 +161,50 @@ void loop(CAF& caf,
   caf.pot = gtree->GetWeight();
   gtree->SetBranchAddress( "gmcrec", &caf.mcrec );
 
-  fdtree->SetBranchAddress("truenumuscore", &caf.sr.FDPredCVNResultIsAntineutrino)
+  int eventIDIn = -1;
+  intree->SetBranchAddress("eventID", &eventIDIn);
+
+  int eventIDFD = -1;
+  fdtree->SetBranchAddress("eventID", &eventIDFD);
+  std::map<int, int> eventIDToEntry;
+  for (int iEntry = 0; iEntry < fdtree->GetEntries(); iEntry++) {
+    fdtree->GetEntry(iEntry);
+    if (eventIDToEntry.find(eventIDFD) == eventIDToEntry.end()) {
+      eventIDToEntry[eventIDFD] = iEntry;
+    }
+    else {
+      std::cout << "Problemo\n";
+    }
+  }
+
+  fdtree->SetBranchAddress("NetworkAntiNuScore", &caf.sr.FDPredCVNResultAntineutrino);
+  fdtree->SetBranchAddress("NetworkNueScore", &caf.sr.FDPredCVNResultNue);
+  fdtree->SetBranchAddress("NetworkNumuScore", &caf.sr.FDPredCVNResultNumu);
+  fdtree->SetBranchAddress("NetworkNutauScore", &caf.sr.FDPredCVNResultNutau);
+  fdtree->SetBranchAddress("NetworkNCScore", &caf.sr.FDPredCVNResultNC);
+  fdtree->SetBranchAddress("NetworkNumuNuE", &caf.sr.FDPredEvRecoNumu);
+  fdtree->SetBranchAddress("NetworkNumuHadE", &caf.sr.FDPredEvRecoHadNumu);
+  fdtree->SetBranchAddress("NetworkNumuLepE", &caf.sr.FDPredEvRecoLepNumu);
+  fdtree->SetBranchAddress("NetworkNueNuE", &caf.sr.FDPredEvRecoNue);
+  fdtree->SetBranchAddress("NetworkNueHadE", &caf.sr.FDPredEvRecoHadNue);
+  fdtree->SetBranchAddress("NetworkNueLepE", &caf.sr.FDPredEvRecoLepNue);
+  fdtree->SetBranchAddress("NetworkNCNuE", &caf.sr.FDPredEvRecoNC);
+  fdtree->SetBranchAddress("NetworkNCHadE", &caf.sr.FDPredEvRecoHadNC);
+  fdtree->SetBranchAddress("NetworkNCLepE", &caf.sr.FDPredEvRecoLepNC);
+  fdtree->SetBranchAddress("TrueAntiNuScore", &caf.sr.FDTrueCVNResultAntineutrino);
+  fdtree->SetBranchAddress("TrueNueScore", &caf.sr.FDTrueCVNResultNue);
+  fdtree->SetBranchAddress("TrueNumuScore", &caf.sr.FDTrueCVNResultNumu);
+  fdtree->SetBranchAddress("TrueNutauScore", &caf.sr.FDTrueCVNResultNutau);
+  fdtree->SetBranchAddress("TrueNCScore", &caf.sr.FDTrueCVNResultNC);
+  fdtree->SetBranchAddress("TrueNumuNuE", &caf.sr.FDTrueEvRecoNumu);
+  fdtree->SetBranchAddress("TrueNumuHadE", &caf.sr.FDTrueEvRecoHadNumu);
+  fdtree->SetBranchAddress("TrueNumuLepE", &caf.sr.FDTrueEvRecoLepNumu);
+  fdtree->SetBranchAddress("TrueNueNuE", &caf.sr.FDTrueEvRecoNue);
+  fdtree->SetBranchAddress("TrueNueHadE", &caf.sr.FDTrueEvRecoHadNue);
+  fdtree->SetBranchAddress("TrueNueLepE", &caf.sr.FDTrueEvRecoLepNue);
+  fdtree->SetBranchAddress("TrueNCNuE", &caf.sr.FDTrueEvRecoNC);
+  fdtree->SetBranchAddress("TrueNCHadE", &caf.sr.FDTrueEvRecoHadNC);
+  fdtree->SetBranchAddress("TrueNCLepE", &caf.sr.FDTrueEvRecoLepNC);
 
   // Main event loop
   int N = par().cafmaker().numevts() > 0 ? par().cafmaker().numevts() : intree->GetEntries() - par().cafmaker().first();
@@ -172,6 +216,13 @@ void loop(CAF& caf,
 
     // reset (the default constructor initializes its variables)
     caf.setToBS();
+
+    if (eventIDToEntry.find(eventIDIn) != eventIDToEntry.end()) {
+      fdtree->GetEntry(eventIDToEntry[eventIDIn]);
+    }
+    else {
+      std::cout << "eventID " << eventIDIn << " is missing in FD predictions tree\n";
+    }
 
     caf.sr.run = par().runInfo().run();
     caf.sr.subrun = par().runInfo().subrun();
@@ -218,10 +269,10 @@ int main( int argc, char const *argv[] )
   TTree * gtree = (TTree*) gf->Get( "gtree" );
 
   // Write FD predicitions from TTree to CAF file (should go in a reco filler I guess, just putting in the main loop for now)
-  TFIle* fileFDPred = new TFile(par().cafmaker().fdpredsFile().c_str());
+  TFile* fileFDPred = new TFile(par().cafmaker().fdpredsFile().c_str());
   TTree* treeFDPred = (TTree*)fileFDPred->Get("recodump/FDReco");
 
-  loop( caf, par, tree, gtree, getRecoFillers(par) );
+  loop( caf, par, tree, gtree, treeFDPred, getRecoFillers(par) );
 
   caf.version = 4;
   printf( "Run %d POT %g\n", caf.meta_run, caf.pot );

@@ -10,8 +10,9 @@ setup geant4 v4_10_3_p01b -q e15:debug
 setup jobsub_client
 setup eigen v3_3_5
 # setup duneanaobj v01_01_01 -q debug:e15:gv1 # Need to be debug not prof
-setup duneanaobj vfd_preds -q debug:e20 # Need to be debug not prof
-setup root v6_12_06a -q debug:e15 # Prevent root running ahead of compiler when e20 duneanaobj is used
+# setup duneanaobj vfd_preds -q debug:e20
+setup duneanaobj vfd_preds -q debug:e15
+# setup root v6_12_06a -q debug:e15 # Prevent root running ahead of compiler when e20 duneanaobj is used
 setup hdf5 v1_10_2a -q e15
 setup fhiclcpp v4_06_08 -q debug:e15
 

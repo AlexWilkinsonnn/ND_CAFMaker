@@ -104,9 +104,10 @@ fi
 GEOMETRY="MPD_SPY_LAr"
 TOPVOL="volArgonCubeActive"
 
-TARDIR="/pnfs/dune/persistent/users/LBL_TDR/sw_tarballs"
-#OUTDIR="/pnfs/dune/persistent/users/marshalc/nd_offaxis/v7"
-OUTDIR="/dune/data2/users/awilkins/extrapolation/nd_cafs"
+# TARDIR="/pnfs/dune/persistent/users/LBL_TDR/sw_tarballs"
+# OUTDIR="/pnfs/dune/persistent/users/marshalc/nd_offaxis/v7"
+# OUTDIR="/dune/data2/users/awilkins/extrapolation/nd_cafs"
+OUTDIR="/pnfs/dune/persistent/users/awilkins/cafmaker"
 
 # Don't try over and over again to copy a file when it isn't going to work
 export IFDH_CP_UNLINK_ON_ERROR=1
@@ -133,16 +134,16 @@ export PATH=$PATH:$GEANT4_FQ_DIR/bin
 
 ##################################################
 # Get the binaries & other files that are needed
-${CP} ${TARDIR}/sim_inputs.tar.gz sim_inputs.tar.gz
-${CP} ${TARDIR}/edep-sim.tar.gz edep-sim.tar.gz
-${CP} ${TARDIR}/nusystematics.tar.gz nusystematics.tar.gz
-${CP} ${TARDIR}/nusyst_inputs.tar.gz nusyst_inputs.tar.gz
-
-tar -xzf sim_inputs.tar.gz
-tar -xzf edep-sim.tar.gz
-tar -xzf nusystematics.tar.gz
-tar -xzf nusyst_inputs.tar.gz
-mv sim_inputs/* ${PWD}
+# ${CP} ${TARDIR}/sim_inputs.tar.gz sim_inputs.tar.gz
+# ${CP} ${TARDIR}/edep-sim.tar.gz edep-sim.tar.gz
+# ${CP} ${TARDIR}/nusystematics.tar.gz nusystematics.tar.gz
+# ${CP} ${TARDIR}/nusyst_inputs.tar.gz nusyst_inputs.tar.gz
+# 
+# tar -xzf sim_inputs.tar.gz
+# tar -xzf edep-sim.tar.gz
+# tar -xzf nusystematics.tar.gz
+# tar -xzf nusyst_inputs.tar.gz
+# mv sim_inputs/* ${PWD}
 
 # Get flux files to local node
 # dk2nu files: /pnfs/dune/persistent/users/ljf26/fluxfiles/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/neutrino/flux/dk2nu

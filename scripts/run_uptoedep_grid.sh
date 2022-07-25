@@ -106,7 +106,14 @@ TOPVOL="volArgonCubeActive"
 
 OUTDIR="/pnfs/dune/persistent/users/awilkins/cafmaker"
 
+echo "Running on $(hostname) at ${GLIDEIN_Site}. GLIDEIN_DUNESite = ${GLIDEIN_DUNESite}"
+
+DIRECTORY=ND_CAFMaker_job_uptoedep
+export WORKDIR=${_CONDOR_JOB_IWD}
+
+cd $WORKDIR
 echo "In $PWD"
+ls
 echo "Copying out files to $OUTDIR"
 
 # Don't try over and over again to copy a file when it isn't going to work
@@ -135,13 +142,18 @@ export PATH=$PATH:$GEANT4_FQ_DIR/bin
 ##################################################
 # Get the binaries & other files that are needed
 
-mv sim_inputs/* .
+${CP} ${DIRECTORY}/sim_inputs/* .
+${CP} ${DIRECTORY}/*.py .
 
 # Get flux files to local node
 # dk2nu files: /pnfs/dune/persistent/users/ljf26/fluxfiles/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/neutrino/flux/dk2nu
 # gsimple files: /pnfs/dune/persistent/users/dbrailsf/flux/nd/gsimple/v2_8_6d/OptimizedEngineeredNov2017/neutrino/
+ls
 chmod +x copy_dune_ndtf_flux
-./copy_dune_ndtf_flux --top ${FLUXDIR} --outpath local_flux_files --flavor ${MODE} --base OptimizedEngineeredNov2017 --maxmb=300 ${FLUXOPT}
+./copy_dune_ndtf_flux --top ${FLUXDIR} --outpath local_flux_files --flavor ${MODE} --base OptimizedEngineeredNov2017 --maxmb=300 ${FLUXOPT} -v
+
+echo "local_flux_files:"
+ls local_flux_files
 
 # GENIE for some reason doesn't recognize *.dk2nu.root as dk2nu format, but it works if dk2nu is at the front?
 if [ "${FLUX}" = "dk2nu" ]; then
@@ -182,8 +194,8 @@ gevgen_fnal \
 ##################################################
 # Convert the genie output to rootracker
 
-export LD_LIBRARY_PATH=${PWD}/edep-sim/edep-gcc-6.4.0-x86_64-pc-linux-gnu/lib:${LD_LIBRARY_PATH}
-export PATH=${PWD}/edep-sim/edep-gcc-6.4.0-x86_64-pc-linux-gnu/bin:${PATH}
+export LD_LIBRARY_PATH=${PWD}/${DIRECTORY}/edep-sim/edep-gcc-6.4.0-x86_64-pc-linux-gnu/lib:${LD_LIBRARY_PATH}
+export PATH=${PWD}/${DIRECTORY}/edep-sim/edep-gcc-6.4.0-x86_64-pc-linux-gnu/bin:${PATH}
 
 echo "Running gntpc"
 TIME_ROOTRACKER=`date +%s`
@@ -221,13 +233,13 @@ setup genie_phyopt v2_12_10   -q dkcharmtau
 setup geant4 v4_10_3_p01b -q e15:prof
 
 # Add nusystematics to the paths
-export LD_LIBRARY_PATH=${PWD}/nusystematics/build/Linux/lib:${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH=${PWD}/nusystematics/build/nusystematics/artless:${LD_LIBRARY_PATH}
-export FHICL_FILE_PATH=${PWD}/nusystematics/nusystematics/fcl:${FHICL_FILE_PATH}
+export LD_LIBRARY_PATH=${PWD}/${DIRECTORY}/nusystematics/build/Linux/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${PWD}/${DIRECTORY}/nusystematics/build/nusystematics/artless:${LD_LIBRARY_PATH}
+export FHICL_FILE_PATH=${PWD}/${DIRECTORY}/nusystematics/nusystematics/fcl:${FHICL_FILE_PATH}
 
 # add pyGeoEff to pythonpath, and libgeoEff to LD_LIBRARY_PATH
-export PYTHONPATH=${PWD}/DUNE_ND_GeoEff/lib/:${PYTHONPATH}
-export LD_LIBRARY_PATH=${PWD}/DUNE_ND_GeoEff/lib:${LD_LIBRARY_PATH}
+export PYTHONPATH=${PWD}/${DIRECTORY}/DUNE_ND_GeoEff/lib/:${PYTHONPATH}
+export LD_LIBRARY_PATH=${PWD}/${DIRECTORY}/DUNE_ND_GeoEff/lib:${LD_LIBRARY_PATH}
 
 # Run dumpTree to make a root file, you can start reading again if you averted your eyes before
 TIME_DUMPTREE=`date +%s`
@@ -235,8 +247,8 @@ python dumpTree.py --infile edep.${RNDSEED}.root --outfile ${HORN}.${RNDSEED}.ed
 
 ##################################################
 # Dump edep-sim to h5 for reading into larnd-sim
-source scripts/setup_edepsim.sh
-source scripts/setup_h5py.sh
+source ${DIRECTORY}/scripts/setup_edepsim.sh
+source ${DIRECTORY}/scripts/setup_h5py.sh
 
 python dumpTree_larnd-simv0.2.3_nofire.py edep.${RNDSEED}.root ${HORN}.${RNDSEED}.edep_dump.h5
 

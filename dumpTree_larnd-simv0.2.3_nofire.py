@@ -5,6 +5,8 @@ Converts ROOT file created by edep-sim into HDF5 format
 File from v0.2.3 tag that does not expect the edep-sim units to be converted during the dump.
 
 Swapped fire for argparse and removed tqdm to make it easier to work with edep-sim and ROOT.
+
+Using MakeProject and accessing the data members unique to edep-sim directly (ie. .GetPosition() -> .Position). Trying this because I am struggling to get edep-sim to work in this script in the ND_CAFMaker workflow.
 """
 
 from math import sqrt
@@ -13,32 +15,33 @@ import argparse, sys
 import numpy as np
 import h5py
 
-from ROOT import TG4Event, TFile
+from ROOT import TFile
+import ROOT
 
 # Print the fields in a TG4PrimaryParticle object
 def printPrimaryParticle(depth, primaryParticle):
     print(depth,"Class: ", primaryParticle.ClassName())
-    print(depth,"Track Id:", primaryParticle.GetTrackId())
-    print(depth,"Name:", primaryParticle.GetName())
-    print(depth,"PDG Code:",primaryParticle.GetPDGCode())
-    print(depth,"Momentum:",primaryParticle.GetMomentum().X(),
-          primaryParticle.GetMomentum().Y(),
-          primaryParticle.GetMomentum().Z(),
-          primaryParticle.GetMomentum().E(),
-          primaryParticle.GetMomentum().P(),
-          primaryParticle.GetMomentum().M())
+    print(depth,"Track Id:", primaryParticle.TrackId)
+    print(depth,"Name:", primaryParticle.Name)
+    print(depth,"PDG Code:",primaryParticle.PDGCode)
+    print(depth,"Momentum:",primaryParticle.Momentum.X(),
+          primaryParticle.Momentum.Y(),
+          primaryParticle.Momentum.Z(),
+          primaryParticle.Momentum.E(),
+          primaryParticle.Momentum.P(),
+          primaryParticle.Momentum.M())
 
 # Print the fields in an TG4PrimaryVertex object
 def printPrimaryVertex(depth, primaryVertex):
     print(depth,"Class: ", primaryVertex.ClassName())
-    print(depth,"Position:", primaryVertex.GetPosition().X(),
-          primaryVertex.GetPosition().Y(),
-          primaryVertex.GetPosition().Z(),
-          primaryVertex.GetPosition().T())
-    print(depth,"Generator:",primaryVertex.GetGeneratorName())
-    print(depth,"Reaction:",primaryVertex.GetReaction())
-    print(depth,"Filename:",primaryVertex.GetFilename())
-    print(depth,"InteractionNumber:",primaryVertex.GetInteractionNumber())
+    print(depth,"Position:", primaryVertex.Position.X(),
+          primaryVertex.Position.Y(),
+          primaryVertex.Position.Z(),
+          primaryVertex.Position.T())
+    print(depth,"Generator:",primaryVertex.GeneratorName)
+    print(depth,"Reaction:",primaryVertex.Reaction)
+    print(depth,"Filename:",primaryVertex.Filename)
+    print(depth,"InteractionNumber:",primaryVertex.InteractionNumber)
     depth = depth + ".."
     for infoVertex in primaryVertex.Informational:
         printPrimaryVertex(depth,infoVertex)
@@ -48,50 +51,50 @@ def printPrimaryVertex(depth, primaryVertex):
 # Print the fields in a TG4TrajectoryPoint object
 def printTrajectoryPoint(depth, trajectoryPoint):
     print(depth,"Class: ", trajectoryPoint.ClassName())
-    print(depth,"Position:", trajectoryPoint.GetPosition().X(),
-          trajectoryPoint.GetPosition().Y(),
-          trajectoryPoint.GetPosition().Z(),
-          trajectoryPoint.GetPosition().T())
-    print(depth,"Momentum:", trajectoryPoint.GetMomentum().X(),
-          trajectoryPoint.GetMomentum().Y(),
-          trajectoryPoint.GetMomentum().Z(),
-          trajectoryPoint.GetMomentum().Mag())
-    print(depth,"Process",trajectoryPoint.GetProcess())
-    print(depth,"Subprocess",trajectoryPoint.GetSubprocess())
+    print(depth,"Position:", trajectoryPoint.Position.X(),
+          trajectoryPoint.Position.Y(),
+          trajectoryPoint.Position.Z(),
+          trajectoryPoint.Position.T())
+    print(depth,"Momentum:", trajectoryPoint.Momentum.X(),
+          trajectoryPoint.Momentum.Y(),
+          trajectoryPoint.Momentum.Z(),
+          trajectoryPoint.Momentum.Mag())
+    print(depth,"Process",trajectoryPoint.Process)
+    print(depth,"Subprocess",trajectoryPoint.Subprocess)
 
 # Print the fields in a TG4Trajectory object
 def printTrajectory(depth, trajectory):
     print(depth,"Class: ", trajectory.ClassName())
     depth = depth + ".."
     print(depth,"Track Id/Parent Id:",
-          trajectory.GetTrackId(),
-          trajectory.GetParentId())
-    print(depth,"Name:",trajectory.GetName())
-    print(depth,"PDG Code",trajectory.GetPDGCode())
-    print(depth,"Initial Momentum:",trajectory.GetInitialMomentum().X(),
-          trajectory.GetInitialMomentum().Y(),
-          trajectory.GetInitialMomentum().Z(),
-          trajectory.GetInitialMomentum().E(),
-          trajectory.GetInitialMomentum().P(),
-          trajectory.GetInitialMomentum().M())
+          trajectory.TrackId,
+          trajectory.ParentId)
+    print(depth,"Name:",trajectory.Name)
+    print(depth,"PDG Code",trajectory.PDGCode)
+    print(depth,"Initial Momentum:",trajectory.InitialMomentum.X(),
+          trajectory.InitialMomentum.Y(),
+          trajectory.InitialMomentum.Z(),
+          trajectory.InitialMomentum.E(),
+          trajectory.InitialMomentum.P(),
+          trajectory.InitialMomentum.M())
     for trajectoryPoint in trajectory.Points:
         printTrajectoryPoint(depth,trajectoryPoint)
 
 # Print the fields in a TG4HitSegment object
 def printHitSegment(depth, hitSegment):
     print(depth,"Class: ", hitSegment.ClassName())
-    print(depth,"Primary Id:", hitSegment.GetPrimaryId())
-    print(depth,"Energy Deposit:",hitSegment.GetEnergyDeposit())
-    print(depth,"Secondary Deposit:", hitSegment.GetSecondaryDeposit())
-    print(depth,"Track Length:",hitSegment.GetTrackLength())
-    print(depth,"Start:", hitSegment.GetStart().X(),
-          hitSegment.GetStart().Y(),
-          hitSegment.GetStart().Z(),
-          hitSegment.GetStart().T())
-    print(depth,"Stop:", hitSegment.GetStop().X(),
-          hitSegment.GetStop().Y(),
-          hitSegment.GetStop().Z(),
-          hitSegment.GetStop().T())
+    print(depth,"Primary Id:", hitSegment.PrimaryId)
+    print(depth,"Energy Deposit:",hitSegment.EnergyDeposit)
+    print(depth,"Secondary Deposit:", hitSegment.SecondaryDeposit)
+    print(depth,"Track Length:",hitSegment.TrackLength)
+    print(depth,"Start:", hitSegment.Start.X(),
+          hitSegment.Start.Y(),
+          hitSegment.Start.Z(),
+          hitSegment.Start.T())
+    print(depth,"Stop:", hitSegment.Stop.X(),
+          hitSegment.Stop.Y(),
+          hitSegment.Stop.Z(),
+          hitSegment.Stop.T())
     print(depth,"Contributor:", [contributor for contributor in hitSegment.Contrib])
 
 # Print the fields in a single element of the SegmentDetectors map.
@@ -107,14 +110,15 @@ def dump(input_file, output_file):
 
     # The input file is generated in a previous test (100TestTree.sh).
     inputFile = TFile(input_file)
+    inputFile.MakeProject("EDepSimEvents","*","RECREATE++")
 
     # Get the input tree out of the file.
     inputTree = inputFile.Get("EDepSimEvents")
     print("Class:", inputTree.ClassName())
 
     # Attach a brach to the events.
-    event = TG4Event()
-    inputTree.SetBranchAddress("Event",event)
+    event = ROOT.TG4Event()
+    inputTree.SetBranchAddress("Event",ROOT.AddressOf(event))
 
     # Read all of the events.
     entries = inputTree.GetEntriesFast()
@@ -163,9 +167,9 @@ def dump(input_file, output_file):
         for primaryVertex in event.Primaries:
             #printPrimaryVertex("PP", primaryVertex)
             vertex["eventID"] = event.EventId
-            vertex["x_vert"] = primaryVertex.GetPosition().X()
-            vertex["y_vert"] = primaryVertex.GetPosition().Y()
-            vertex["z_vert"] = primaryVertex.GetPosition().Z()
+            vertex["x_vert"] = primaryVertex.Position.X()
+            vertex["y_vert"] = primaryVertex.Position.Y()
+            vertex["z_vert"] = primaryVertex.Position.Z()
             vertices_list.append(vertex)
 
         # Dump the trajectories
@@ -174,19 +178,19 @@ def dump(input_file, output_file):
         for iTraj, trajectory in enumerate(event.Trajectories):
             start_pt, end_pt = trajectory.Points[0], trajectory.Points[-1]
             trajectories[iTraj]["eventID"] = event.EventId
-            trajectories[iTraj]["trackID"] = trajectory.GetTrackId()
-            trajectories[iTraj]["parentID"] = trajectory.GetParentId()
-            trajectories[iTraj]["pxyz_start"] = (start_pt.GetMomentum().X(), start_pt.GetMomentum().Y(), start_pt.GetMomentum().Z())
-            trajectories[iTraj]["pxyz_end"] = (end_pt.GetMomentum().X(), end_pt.GetMomentum().Y(), end_pt.GetMomentum().Z())
-            trajectories[iTraj]["xyz_start"] = (start_pt.GetPosition().X(), start_pt.GetPosition().Y(), start_pt.GetPosition().Z())
-            trajectories[iTraj]["xyz_end"] = (end_pt.GetPosition().X(), end_pt.GetPosition().Y(), end_pt.GetPosition().Z())
-            trajectories[iTraj]["t_start"] = start_pt.GetPosition().T()
-            trajectories[iTraj]["t_end"] = end_pt.GetPosition().T()
-            trajectories[iTraj]["start_process"] = start_pt.GetProcess()
-            trajectories[iTraj]["start_subprocess"] = start_pt.GetSubprocess()
-            trajectories[iTraj]["end_process"] = end_pt.GetProcess()
-            trajectories[iTraj]["end_subprocess"] = end_pt.GetSubprocess()
-            trajectories[iTraj]["pdgId"] = trajectory.GetPDGCode()
+            trajectories[iTraj]["trackID"] = trajectory.TrackId
+            trajectories[iTraj]["parentID"] = trajectory.ParentId
+            trajectories[iTraj]["pxyz_start"] = (start_pt.Momentum.X(), start_pt.Momentum.Y(), start_pt.Momentum.Z())
+            trajectories[iTraj]["pxyz_end"] = (end_pt.Momentum.X(), end_pt.Momentum.Y(), end_pt.Momentum.Z())
+            trajectories[iTraj]["xyz_start"] = (start_pt.Position.X(), start_pt.Position.Y(), start_pt.Position.Z())
+            trajectories[iTraj]["xyz_end"] = (end_pt.Position.X(), end_pt.Position.Y(), end_pt.Position.Z())
+            trajectories[iTraj]["t_start"] = start_pt.Position.T()
+            trajectories[iTraj]["t_end"] = end_pt.Position.T()
+            trajectories[iTraj]["start_process"] = start_pt.Process
+            trajectories[iTraj]["start_subprocess"] = start_pt.Subprocess
+            trajectories[iTraj]["end_process"] = end_pt.Process
+            trajectories[iTraj]["end_subprocess"] = end_pt.Subprocess
+            trajectories[iTraj]["pdgId"] = trajectory.PDGCode
 
         trajectories_list.append(trajectories)
 
@@ -199,13 +203,13 @@ def dump(input_file, output_file):
             for iHit, hitSegment in enumerate(hitSegments):
                 segment[iHit]["eventID"] = event.EventId
                 segment[iHit]["trackID"] = trajectories[hitSegment.Contrib[0]]["trackID"]
-                segment[iHit]["x_start"] = hitSegment.GetStart().X() / 10
-                segment[iHit]["y_start"] = hitSegment.GetStart().Y() / 10
-                segment[iHit]["z_start"] = hitSegment.GetStart().Z() / 10
-                segment[iHit]["x_end"] = hitSegment.GetStop().X() / 10
-                segment[iHit]["y_end"] = hitSegment.GetStop().Y() / 10
-                segment[iHit]["z_end"] = hitSegment.GetStop().Z() / 10
-                segment[iHit]["dE"] = hitSegment.GetEnergyDeposit()
+                segment[iHit]["x_start"] = hitSegment.Start.X() / 10
+                segment[iHit]["y_start"] = hitSegment.Start.Y() / 10
+                segment[iHit]["z_start"] = hitSegment.Start.Z() / 10
+                segment[iHit]["x_end"] = hitSegment.Stop.X() / 10
+                segment[iHit]["y_end"] = hitSegment.Stop.Y() / 10
+                segment[iHit]["z_end"] = hitSegment.Stop.Z() / 10
+                segment[iHit]["dE"] = hitSegment.EnergyDeposit
                 segment[iHit]["t"] = 0
                 segment[iHit]["t_start"] = 0
                 segment[iHit]["t_end"] = 0
@@ -217,7 +221,7 @@ def dump(input_file, output_file):
                 segment[iHit]["x"] = (segment[iHit]["x_start"] + segment[iHit]["x_end"]) / 2.
                 segment[iHit]["y"] = (segment[iHit]["y_start"] + segment[iHit]["y_end"]) / 2.
                 segment[iHit]["z"] = (segment[iHit]["z_start"] + segment[iHit]["z_end"]) / 2.
-                segment[iHit]["dEdx"] = hitSegment.GetEnergyDeposit() / dx if dx > 0 else 0
+                segment[iHit]["dEdx"] = hitSegment.EnergyDeposit / dx if dx > 0 else 0
                 segment[iHit]["pdgId"] = trajectories[hitSegment.Contrib[0]]["pdgId"]
                 segment[iHit]["n_electrons"] = 0
                 segment[iHit]["long_diff"] = 0

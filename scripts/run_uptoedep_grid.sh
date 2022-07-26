@@ -247,8 +247,7 @@ python dumpTree.py --infile edep.${RNDSEED}.root --outfile ${HORN}.${RNDSEED}.ed
 
 ##################################################
 # Dump edep-sim to h5 for reading into larnd-sim
-source ${DIRECTORY}/scripts/setup_edepsim.sh
-source ${DIRECTORY}/scripts/setup_h5py.sh
+setup h5py v2_9_0 -q e17:p2715a:prof
 
 python dumpTree_larnd-simv0.2.3_nofire.py edep.${RNDSEED}.root ${HORN}.${RNDSEED}.edep_dump.h5
 

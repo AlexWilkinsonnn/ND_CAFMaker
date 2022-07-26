@@ -126,7 +126,7 @@ export IFDH_DEBUG=0
 # Setup UPS and required products
 echo "Setting up software"
 source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh
-setup ifdhc
+setup ifdhc v2_6_6
 setup dk2nugenie   v01_06_01f -q debug:e15
 setup genie_xsec   v2_12_10   -q DefaultPlusValenciaMEC
 setup genie_phyopt v2_12_10   -q dkcharmtau
@@ -142,8 +142,8 @@ export PATH=$PATH:$GEANT4_FQ_DIR/bin
 ##################################################
 # Get the binaries & other files that are needed
 
-${CP} ${DIRECTORY}/sim_inputs/* .
-${CP} ${DIRECTORY}/*.py .
+${CP} -D ${DIRECTORY}/sim_inputs/* .
+${CP} -D ${DIRECTORY}/*.py .
 
 # Get flux files to local node
 # dk2nu files: /pnfs/dune/persistent/users/ljf26/fluxfiles/g4lbne/v3r5p4/QGSP_BERT/OptimizedEngineeredNov2017/neutrino/flux/dk2nu
@@ -226,7 +226,7 @@ edep-sim \
 # The MakeProject in dumpTree.py won't work if edep-sim is in the library path for reasons unknown
 # This is a hack, please avert your eyes if you don't want to see my garbage
 unset LD_LIBRARY_PATH
-setup ifdhc
+setup ifdhc v2_6_6
 setup dk2nugenie   v01_06_01f -q debug:e15
 setup genie_xsec   v2_12_10   -q DefaultPlusValenciaMEC
 setup genie_phyopt v2_12_10   -q dkcharmtau

@@ -1,6 +1,7 @@
 *.o
 *.tar.gz
 AutoDict_*
+*.root
 
 edep-sim/
 lib/

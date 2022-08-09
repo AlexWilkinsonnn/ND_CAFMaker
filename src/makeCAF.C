@@ -191,6 +191,7 @@ void loop(CAF& caf,
   fdtree->SetBranchAddress("NetworkNCNuE", &caf.sr.FDPredEvRecoNC);
   fdtree->SetBranchAddress("NetworkNCHadE", &caf.sr.FDPredEvRecoHadNC);
   fdtree->SetBranchAddress("NetworkNCLepE", &caf.sr.FDPredEvRecoLepNC);
+  fdtree->SetBranchAddress("NetworkNumHits", &caf.sr.FDPredNumHits);
   fdtree->SetBranchAddress("TrueAntiNuScore", &caf.sr.FDTrueCVNResultAntineutrino);
   fdtree->SetBranchAddress("TrueNueScore", &caf.sr.FDTrueCVNResultNue);
   fdtree->SetBranchAddress("TrueNumuScore", &caf.sr.FDTrueCVNResultNumu);
@@ -205,6 +206,7 @@ void loop(CAF& caf,
   fdtree->SetBranchAddress("TrueNCNuE", &caf.sr.FDTrueEvRecoNC);
   fdtree->SetBranchAddress("TrueNCHadE", &caf.sr.FDTrueEvRecoHadNC);
   fdtree->SetBranchAddress("TrueNCLepE", &caf.sr.FDTrueEvRecoLepNC);
+  fdtree->SetBranchAddress("TrueNumHits", &caf.sr.FDTrueNumHits);
 
   // Main event loop
   int N = par().cafmaker().numevts() > 0 ? par().cafmaker().numevts() : intree->GetEntries() - par().cafmaker().first();

@@ -283,8 +283,15 @@ void loop( CAF &caf, params &par, TTree * tree, TTree * gtree, TTree * fdtree, s
 
     tree->GetEntry(ii);
     if( ii % 100 == 0 ) printf( "Event %d of %d...\n", ii, N );
-
+    
     caf.setToBS();
+
+    if (eventIDToEntry.find(eventIDND) != eventIDToEntry.end()) {
+      fdtree->GetEntry(eventIDToEntry[eventIDND]);
+    }
+    else {
+      std::cout << "eventID " << eventIDND << " is missing in FD predictions file\n";
+    }
 
     // set defaults
     for( int j = 0; j < 100; ++j ) {

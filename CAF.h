@@ -63,6 +63,29 @@ public:
   // Event-by-event geometric efficiency throw results
   std::vector< std::vector < std::vector < uint64_t > > > * geoEffThrowResults;
 
+  // FD predictions for ND events from translation network
+  float FDPredCVNResultAntineutrino;
+  float FDPredCVNResultNue;
+  float FDPredCVNResultNumu;
+  float FDPredCVNResultNutau;
+  float FDPredCVNResultNC;
+  float FDPredEvRecoNumu, FDPredEvRecoHadNumu, FDPredEvRecoLepNumu;
+  float FDPredEvRecoNue, FDPredEvRecoHadNue, FDPredEvRecoLepNue;
+  float FDPredEvRecoNC, FDPredEvRecoHadNC, FDPredEvRecoLepNC;
+  int   FDPredNumHits;
+
+  // True FD reco (assuming event is fully contained in ND) for ND events from resimulating true charge in FD 
+  // Only exists for MC.
+  float FDTrueCVNResultAntineutrino;
+  float FDTrueCVNResultNue;
+  float FDTrueCVNResultNumu;
+  float FDTrueCVNResultNutau;
+  float FDTrueCVNResultNC;
+  float FDTrueEvRecoNumu, FDTrueEvRecoHadNumu, FDTrueEvRecoLepNumu;
+  float FDTrueEvRecoNue, FDTrueEvRecoHadNue, FDTrueEvRecoLepNue;
+  float FDTrueEvRecoNC, FDTrueEvRecoHadNC, FDTrueEvRecoLepNC;
+  int   FDTrueNumHits;
+
   // meta
   double pot;
   int meta_run, meta_subrun;

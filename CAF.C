@@ -105,6 +105,38 @@ CAF::CAF( std::string filename, bool isGas )
 
   cafMVA->Branch("geoEffThrowResults", &geoEffThrowResults);
 
+  cafMVA->Branch("FDPredCVNResultAntineutrino", &FDPredCVNResultAntineutrino, "FDPredCVNResultAntineutrino/F" );
+  cafMVA->Branch("FDPredCVNResultNue", &FDPredCVNResultNue, "FDPredCVNResultNue/F" );
+  cafMVA->Branch("FDPredCVNResultNumu", &FDPredCVNResultNumu, "FDPredCVNResultNumu/F" );
+  cafMVA->Branch("FDPredCVNResultNutau", &FDPredCVNResultAntineutrino, "FDPredCVNResultAntineutrino/F" );
+  cafMVA->Branch("FDPredCVNResultNC", &FDPredCVNResultAntineutrino, "FDPredCVNResultAntineutrino/F" );
+  cafMVA->Branch("FDPredEvRecoNumu", &FDPredEvRecoNumu, "FDPredCVNResultEvRecoNumu/F" );
+  cafMVA->Branch("FDPredEvRecoHadNumu", &FDPredEvRecoHadNumu, "FDPredCVNResultEvRecoHadNumu/F" );
+  cafMVA->Branch("FDPredEvRecoLepNumu", &FDPredEvRecoLepNumu, "FDPredCVNResultEvRecoLepNumu/F" );
+  cafMVA->Branch("FDPredEvRecoNue", &FDPredEvRecoNue, "FDPredCVNResultEvRecoNue/F" );
+  cafMVA->Branch("FDPredEvRecoHadNue", &FDPredEvRecoHadNue, "FDPredCVNResultEvRecoHadNue/F" );
+  cafMVA->Branch("FDPredEvRecoLepNue", &FDPredEvRecoLepNue, "FDPredCVNResultEvRecoLepNue/F" );
+  cafMVA->Branch("FDPredEvRecoNC", &FDPredEvRecoNC, "FDPredCVNResultEvRecoNC/F" );
+  cafMVA->Branch("FDPredEvRecoHadNC", &FDPredEvRecoHadNC, "FDPredCVNResultEvRecoHadNC/F" );
+  cafMVA->Branch("FDPredEvRecoLepNC", &FDPredEvRecoLepNC, "FDPredCVNResultEvRecoLepNC/F" );
+  cafMVA->Branch("FDPredNumHits", &FDPredNumHits, "FDPredNumHits/I" );
+
+  cafMVA->Branch("FDTrueCVNResultAntineutrino", &FDTrueCVNResultAntineutrino, "FDTrueCVNResultAntineutrino/F" );
+  cafMVA->Branch("FDTrueCVNResultNue", &FDTrueCVNResultNue, "FDTrueCVNResultNue/F" );
+  cafMVA->Branch("FDTrueCVNResultNumu", &FDTrueCVNResultNumu, "FDTrueCVNResultNumu/F" );
+  cafMVA->Branch("FDTrueCVNResultNutau", &FDTrueCVNResultAntineutrino, "FDTrueCVNResultAntineutrino/F" );
+  cafMVA->Branch("FDTrueCVNResultNC", &FDTrueCVNResultAntineutrino, "FDTrueCVNResultAntineutrino/F" );
+  cafMVA->Branch("FDTrueEvRecoNumu", &FDTrueEvRecoNumu, "FDTrueCVNResultEvRecoNumu/F" );
+  cafMVA->Branch("FDTrueEvRecoHadNumu", &FDTrueEvRecoHadNumu, "FDTrueCVNResultEvRecoHadNumu/F" );
+  cafMVA->Branch("FDTrueEvRecoLepNumu", &FDTrueEvRecoLepNumu, "FDTrueCVNResultEvRecoLepNumu/F" );
+  cafMVA->Branch("FDTrueEvRecoNue", &FDTrueEvRecoNue, "FDTrueCVNResultEvRecoNue/F" );
+  cafMVA->Branch("FDTrueEvRecoHadNue", &FDTrueEvRecoHadNue, "FDTrueCVNResultEvRecoHadNue/F" );
+  cafMVA->Branch("FDTrueEvRecoLepNue", &FDTrueEvRecoLepNue, "FDTrueCVNResultEvRecoLepNue/F" );
+  cafMVA->Branch("FDTrueEvRecoNC", &FDTrueEvRecoNC, "FDTrueCVNResultEvRecoNC/F" );
+  cafMVA->Branch("FDTrueEvRecoHadNC", &FDTrueEvRecoHadNC, "FDTrueCVNResultEvRecoHadNC/F" );
+  cafMVA->Branch("FDTrueEvRecoLepNC", &FDTrueEvRecoLepNC, "FDTrueCVNResultEvRecoLepNC/F" );
+  cafMVA->Branch("FDTrueNumHits", &FDTrueNumHits, "FDTrueNumHits/I" );
+
   genie->Branch( "genie_record", &mcrec );
 
   cafPOT->Branch( "pot", &pot, "pot/D" );
@@ -175,6 +207,25 @@ void CAF::setToBS()
   gastpc_pi_pl_mult = 0;
   gastpc_pi_min_mult = 0;
   nFSP = 0;
+
+  FDPredCVNResultAntineutrino = -9999.0;
+  FDPredCVNResultNue = -9999.0;
+  FDPredCVNResultNumu = -9999.0;
+  FDPredCVNResultNutau = -9999.0;
+  FDPredCVNResultNC = -9999.0;
+  FDPredEvRecoNumu = -9999.0; FDPredEvRecoLepNumu = -9999.0 ; FDPredEvRecoHadNumu = -9999.0;
+  FDPredEvRecoNue = -9999.0; FDPredEvRecoLepNue = -9999.0 ; FDPredEvRecoHadNue = -9999.0;
+  FDPredEvRecoNC = -9999.0; FDPredEvRecoLepNC = -9999.0 ; FDPredEvRecoHadNC = -9999.0;
+  FDPredNumHits = -1;
+  FDTrueCVNResultAntineutrino = -9999.0;
+  FDTrueCVNResultNue = -9999.0;
+  FDTrueCVNResultNumu = -9999.0;
+  FDTrueCVNResultNutau = -9999.0;
+  FDTrueCVNResultNC = -9999.0;
+  FDTrueEvRecoNumu = -9999.0; FDTrueEvRecoLepNumu = -9999.0 ; FDTrueEvRecoHadNumu = -9999.0;
+  FDTrueEvRecoNue = -9999.0; FDTrueEvRecoLepNue = -9999.0 ; FDTrueEvRecoHadNue = -9999.0;
+  FDTrueEvRecoNC = -9999.0; FDTrueEvRecoLepNC = -9999.0 ; FDTrueEvRecoHadNC = -9999.0;
+  FDTrueNumHits = -1;
 
   // nwgt and iswgt do not change event by event and are set outside the event loop
   // do not reset them to BS here

@@ -37,7 +37,8 @@ cd ${TOPDIR}
 #
 # v00_04_01 is the last version to depend on genie v2 (specifically v2_12_10d)
 if [ $FORCE == yes ]; then rm -rf nusystematics; fi
-git clone ssh://p-nusystematics@cdcvs.fnal.gov/cvs/projects/nusystematics -b v00_04_01
+# git clone ssh://p-nusystematics@cdcvs.fnal.gov/cvs/projects/nusystematics -b v00_04_01
+git clone git@github.com:LArSoft/nusystematics.git -b v00_04_01
 mkdir nusystematics/build
 cd nusystematics/build
 cmake ../ -DUSEART=0 -DLIBXML2_LIB=/cvmfs/larsoft.opensciencegrid.org/products/libxml2/v2_9_5/Linux64bit+2.6-2.12-prof/lib/ -DLIBXML2_INC=/cvmfs/larsoft.opensciencegrid.org/products/libxml2/v2_9_5/Linux64bit+2.6-2.12-prof/include/libxml2 -DPYTHIA6=/cvmfs/larsoft.opensciencegrid.org/products/pythia/v6_4_28i/Linux64bit+2.6-2.12-gcc640-prof/lib

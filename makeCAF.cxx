@@ -8,6 +8,7 @@
 #include "EVGCore/EventRecord.h"
 #include "nusystematics/artless/response_helper.hh"
 #include <stdio.h>
+#include <map>
 
 TRandom3 * rando;
 const double mmu = 0.1056583745;
@@ -174,7 +175,7 @@ void decayPi0( TLorentzVector pi0, TVector3 &gamma1, TVector3 &gamma2 )
 }
 
 // main loop function
-void loop( CAF &caf, params &par, TTree * tree, TTree * gtree, std::string fhicl_filename )
+void loop( CAF &caf, params &par, TTree * tree, TTree * gtree, TTree * fdtree, std::string fhicl_filename )
 {
   // read in dumpTree output file
   int ievt, lepPdg, muonReco, nFS;
@@ -213,6 +214,52 @@ void loop( CAF &caf, params &par, TTree * tree, TTree * gtree, std::string fhicl
   tree->SetBranchAddress( "fsTrkLenPerp", fsTrkLenPerp );
 
   tree->SetBranchAddress( "geoEffThrowResults", &caf.geoEffThrowResults );
+
+  int eventIDND = -1; int eventIDFD = -1;
+  tree->SetBranchAddress("eventID", &eventIDND);
+  fdtree->SetBranchAddress("eventID", &eventIDFD);
+  std::map<int, int> eventIDToEntry;
+  for (int iEntry = 0; iEntry < fdtree->GetEntries(); iEntry++) {
+    fdtree->GetEntry(iEntry);
+    if (eventIDToEntry.find(eventIDFD) == eventIDToEntry.end()) {
+      eventIDToEntry[eventIDFD] = iEntry;
+    }
+    else {
+      std::cout << "Problemo\n";
+    }
+  }
+
+  // Read in FD predictions
+  fdtree->SetBranchAddress("NetworkAntiNuScore", &caf.FDPredCVNResultAntineutrino);
+  fdtree->SetBranchAddress("NetworkNueScore", &caf.FDPredCVNResultNue);
+  fdtree->SetBranchAddress("NetworkNumuScore", &caf.FDPredCVNResultNumu);
+  fdtree->SetBranchAddress("NetworkNutauScore", &caf.FDPredCVNResultNutau);
+  fdtree->SetBranchAddress("NetworkNCScore", &caf.FDPredCVNResultNC);
+  fdtree->SetBranchAddress("NetworkNumuNuE", &caf.FDPredEvRecoNumu);
+  fdtree->SetBranchAddress("NetworkNumuHadE", &caf.FDPredEvRecoHadNumu);
+  fdtree->SetBranchAddress("NetworkNumuLepE", &caf.FDPredEvRecoLepNumu);
+  fdtree->SetBranchAddress("NetworkNueNuE", &caf.FDPredEvRecoNue);
+  fdtree->SetBranchAddress("NetworkNueHadE", &caf.FDPredEvRecoHadNue);
+  fdtree->SetBranchAddress("NetworkNueLepE", &caf.FDPredEvRecoLepNue);
+  fdtree->SetBranchAddress("NetworkNCNuE", &caf.FDPredEvRecoNC);
+  fdtree->SetBranchAddress("NetworkNCHadE", &caf.FDPredEvRecoHadNC);
+  fdtree->SetBranchAddress("NetworkNCLepE", &caf.FDPredEvRecoLepNC);
+  fdtree->SetBranchAddress("NetworkNumHits", &caf.FDPredNumHits);
+  fdtree->SetBranchAddress("TrueAntiNuScore", &caf.FDTrueCVNResultAntineutrino);
+  fdtree->SetBranchAddress("TrueNueScore", &caf.FDTrueCVNResultNue);
+  fdtree->SetBranchAddress("TrueNumuScore", &caf.FDTrueCVNResultNumu);
+  fdtree->SetBranchAddress("TrueNutauScore", &caf.FDTrueCVNResultNutau);
+  fdtree->SetBranchAddress("TrueNCScore", &caf.FDTrueCVNResultNC);
+  fdtree->SetBranchAddress("TrueNumuNuE", &caf.FDTrueEvRecoNumu);
+  fdtree->SetBranchAddress("TrueNumuHadE", &caf.FDTrueEvRecoHadNumu);
+  fdtree->SetBranchAddress("TrueNumuLepE", &caf.FDTrueEvRecoLepNumu);
+  fdtree->SetBranchAddress("TrueNueNuE", &caf.FDTrueEvRecoNue);
+  fdtree->SetBranchAddress("TrueNueHadE", &caf.FDTrueEvRecoHadNue);
+  fdtree->SetBranchAddress("TrueNueLepE", &caf.FDTrueEvRecoLepNue);
+  fdtree->SetBranchAddress("TrueNCNuE", &caf.FDTrueEvRecoNC);
+  fdtree->SetBranchAddress("TrueNCHadE", &caf.FDTrueEvRecoHadNC);
+  fdtree->SetBranchAddress("TrueNCLepE", &caf.FDTrueEvRecoLepNC);
+  fdtree->SetBranchAddress("TrueNumHits", &caf.FDTrueNumHits);
 
   // DUNE reweight getter
   nusyst::response_helper rh( fhicl_filename );
@@ -543,6 +590,7 @@ int main( int argc, char const *argv[] )
   std::string infile;
   std::string outfile;
   std::string fhicl_filename;
+  std::string fdpredsfile;
 
   // Make parameter object and set defaults
   params par;
@@ -595,6 +643,9 @@ int main( int argc, char const *argv[] )
     } else if( argv[i] == std::string("--gastpc") ) {
       par.IsGasTPC = true;
       i += 1;
+    } else if( argv[i] == std::string("--fdpreds") ) {
+      fdpredsfile = argv[i+1];
+      i += 2;
     } else i += 1; // look for next thing
   }
 
@@ -610,7 +661,10 @@ int main( int argc, char const *argv[] )
   TFile * gf = new TFile( gfile.c_str() );
   TTree * gtree = (TTree*) gf->Get( "gtree" );
 
-  loop( caf, par, tree, gtree, fhicl_filename );
+  TFile * fdf = new TFile( fdpredsfile.c_str() );
+  TTree * fdtree = (TTree*) fdf->Get( "recodump/FDReco" );
+
+  loop( caf, par, tree, gtree, fdtree, fhicl_filename );
 
   caf.version = 4;
   printf( "Run %d POT %g\n", caf.meta_run, caf.pot );

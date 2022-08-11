@@ -1,0 +1,13 @@
+AutoDict*
+*.tar.gz
+*.root
+*.o
+
+src/
+edep-sim/
+nusystematics/
+DUNE_ND_GeoEff/
+lib/
+bin/
+makeCAF
+

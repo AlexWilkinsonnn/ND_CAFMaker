@@ -4,6 +4,7 @@ OUT_DIR=/pnfs/dune/persistent/users/awilkins/cafmaker/old_cafs/0m/00
 DONE_FILE=done.txt
 
 source ../ndcaf_setup.sh
+export LD_LIBRARY_PATH=/dune/app/users/awilkins/nd_cafs/ND_CAFMaker:$LD_LIBRARY_PATH
 
 for FDRECO_FILE in `ifdh ls /pnfs/dune/persistent/users/awilkins/cafmaker/fdreco/0m/00/ | tail -n +2`; do
   echo $FDRECO_FILE

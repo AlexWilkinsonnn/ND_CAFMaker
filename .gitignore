@@ -9,3 +9,7 @@ local_flux_files/
 DUNE_ND_GeoEff/
 bin/
 EDepSimEvents/
+nusyst_inputs/
+nusystematics/
+
+makeCAF

@@ -5,7 +5,7 @@
 # using paired ND data.
 ################################################################################
 
-SAM_PROJECT=$1
+TRANSLATED_FILENAMEPATH=$1
 
 ################################################################################
 # Setup general working area
@@ -75,46 +75,21 @@ fi
 ################################################################################
 # Data copy in
 
-echo Finding Project
-PROJURL=`ifdh findProject $SAM_PROJECT dune | grep http`
-echo PROJURL is $$PROJURL
+echo "Copying in $TRANSLATED_FILENAMEPATH"
 
-echo Establishing process
-ID=`ifdh establishProcess "$PROJURL" "fdtruedetsim_fdnetworktruereco_makecaf" "$ART_VERSION" "$HOSTNAME" "$USER" "fdtruedetsim_fdnetworktruereco_makecaf.sh" "" "" "" "" || exit 1`
-echo ID is $ID
-
-echo Finding file
-URI=`ifdh getNextFile $PROJURL $ID || exit`
-if [ "x$URI" == "x" ]; then
-    echo URI null
-    ifdh endProcess $PROJURL $ID
-    ifdh cleanup
-    exit
+TRANSLATED_FILENAME=${TRANSLATED_FILENAMEPATH##*/}
+ifdh cp $TRANSLATED_FILENAMEPATH $TRANSLATED_FILENAME
+if [ $? -ne 0 ]; then
+    echo "Error during translated input-sim copy"
+    exit $?
 fi
-echo URI is $URI
-
-echo Fetching file
-FNAME=`ifdh fetchInput $URI`
-FNAME=`echo "$FNAME" | tail -n1`
-if [ "x$FNAME" == "x" ]; then
-    echo FNAME is null
-    ifdh endProcess $PROJURL $ID
-    ifdh cleanup
-    exit
-fi
-echo FNAME is $FNAME
-
-echo Marking as transferred
-ifdh updateFileStatus $PROJURL $ID $FNAME transferred
-# Not checking the exit status here since I have seen bad exit codes that aren't fatal and I don't
-# want to waste good data
+echo "input translated file $TRANSLATED_FILENAME copied"
 
 ################################################################################
 # FD true detsim, FD true + network reco + FD reco dumper
 
-FNAMELOCAL=${FNAME##*/}
-DETSIM_OUT=${FNAMELOCAL%.root}_fddetsim.root
-lar -c detsim_dune10kt_1x2x6_wirecell_refactored_nooptdet_dropSC_fdlabel.fcl -s $FNAME -o $DETSIM_OUT
+DETSIM_OUT=${TRANSLATED_FILENAME%.root}_fddetsim.root
+lar -c detsim_dune10kt_1x2x6_wirecell_refactored_nooptdet_dropSC_fdlabel.fcl -s $TRANSLATED_FILENAME -o $DETSIM_OUT
 if [ $? -ne 0 ]; then
     echo "lar exited with abnormal status $LAR_RESULT. See error outputs."
     exit $?
@@ -153,7 +128,7 @@ fi
 ################################################################################
 # Get corresponding edep + genie file and make CAF
 
-FILE_NUM=`echo $FNAMELOCAL | sed 's/.*FHC.\(.*\).larnd-sim.tolarsoft_ndtranslated.root/\1/'`
+FILE_NUM=`echo $TRANSLATED_FILENAME | sed 's/.*FHC.\(.*\).larnd-sim.tolarsoft_ndtranslated.root/\1/'`
 
 EDEP_FILENAME=FHC.${FILE_NUM}.edep_dump.root
 ifdh cp ${EDEPDIR}/${EDEP_FILENAME} $EDEP_FILENAME
@@ -161,7 +136,7 @@ if [ $? -ne 0 ]; then
     echo "Error during edep-sim copy"
     exit $?
 fi
-echo "edep edep dump file $EDEP_FILENAME copied"
+echo "edep dump file $EDEP_FILENAME copied"
 
 GENIE_FILENAME=FHC.${FILE_NUM}.ghep.root
 ifdh cp ${GENIEDIR}/${GENIE_FILENAME} $GENIE_FILENAME
@@ -194,17 +169,7 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-echo "Marking as consumed"
-ifdh updateFileStatus $PROJURL $ID $FNAME consumed 
-# Not checking the exit status here since I have seen bad exit codes that aren't fatal and I don't
-# want to waste good data
-
 echo "done"
-
-echo "Ending process"
-ifdh endProcess $PROJURL $ID
-
-ifdh cleanup
 
 echo "Completed successfully."
 exit 0

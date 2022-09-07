@@ -1,12 +1,15 @@
 #!/bin/bash
 
-OUT_DIR=/pnfs/dune/persistent/users/awilkins/cafmaker/old_cafs/0m/00
+FDRECO_DIR=/pnfs/dune/persistent/users/awilkins/cafmaker/fdreco_fixedErec/0m/00/
+OUT_DIR=/pnfs/dune/persistent/users/awilkins/cafmaker/old_cafs_fixedErec/0m/00
 DONE_FILE=done.txt
 
-source ../ndcaf_setup.sh
+cd ../
+source ndcaf_setup.sh # Relies on ${PWD}
+cd scripts/
 export LD_LIBRARY_PATH=/dune/app/users/awilkins/nd_cafs/ND_CAFMaker:$LD_LIBRARY_PATH
 
-for FDRECO_FILE in `ifdh ls /pnfs/dune/persistent/users/awilkins/cafmaker/fdreco/0m/00/ | tail -n +2`; do
+for FDRECO_FILE in `ifdh ls $FDRECO_DIR | tail -n +2`; do
   echo $FDRECO_FILE
   FILE_NUM=`echo $FDRECO_FILE | \
             sed 's/.*FHC.\(.*\).larnd-sim.tolarsoft_ndtranslated_fddetsim_recotrue_reconetwork_recodump.root/\1/'`
